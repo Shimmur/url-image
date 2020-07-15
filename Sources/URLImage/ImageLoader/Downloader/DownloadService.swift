@@ -126,7 +126,8 @@ final class DownloadServiceImpl: DownloadService {
     }
     
     private func _add(_ handler: DownloadHandler, forURLRequest urlRequest: URLRequest, withFileIdentifier fileIdentifier: String, retryCount: Int) {
-        queue.addOperation {
+        queue.addOperation { [weak self] in
+            guard let self = self else { return }
             let downloader: DownloadCoordinator
 
             if let existingDownloader = self.fileIdentifierToDownloaderMap[fileIdentifier] {
