@@ -27,7 +27,7 @@ final class DownloadServiceImpl: DownloadService {
         let configuration = URLSessionConfiguration.default.copy(with: nil) as! URLSessionConfiguration
         configuration.httpMaximumConnectionsPerHost = 1
 
-        urlSessionDelegate = URLSessionDelegateWrapper()
+        let urlSessionDelegate = URLSessionDelegateWrapper()
         urlSession = URLSession(configuration: configuration, delegate: urlSessionDelegate, delegateQueue: queue)
 
         self.remoteFileCache = remoteFileCache
@@ -208,7 +208,7 @@ final class DownloadServiceImpl: DownloadService {
     }()
 
     private let urlSession: URLSession
-    private let urlSessionDelegate: URLSessionDelegateWrapper
+//    private let urlSessionDelegate: URLSessionDelegateWrapper
 
     private unowned let remoteFileCache: RemoteFileCacheService
 
