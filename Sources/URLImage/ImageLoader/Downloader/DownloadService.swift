@@ -40,7 +40,7 @@ final class DownloadServiceImpl: DownloadService {
             return fileIdentifierToDownloaderMap[fileIdentifier]
         }
 
-        urlSessionDelegate.finishDownloadingCallback = { task, tmpURL in
+        urlSessionDelegate.finishDownloadingCallback = { [weak self] task, tmpURL in
             if let url = task.originalRequest?.url {
                 log_debug(self, "Finish downloading \"\(url)\".")
             }
@@ -82,7 +82,7 @@ final class DownloadServiceImpl: DownloadService {
             downloader.append(data: data)
         }
 
-        urlSessionDelegate.completeCallback = { task, error in
+        urlSessionDelegate.completeCallback = { [weak self] task, error in
             if let url = task.originalRequest?.url {
                 log_debug(self, "Complete \"\(url)\".")
             }
@@ -107,7 +107,8 @@ final class DownloadServiceImpl: DownloadService {
 
             let expiryDate = downloader.expiryDate
             
-            DispatchQueue.main.async {
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
                 if let url = request.url {
                     log_debug(self, "Retry for: \"\(url)\" with retry count: \(currentRetryCount)", detail: log_detailed)
                 }
@@ -136,8 +137,10 @@ final class DownloadServiceImpl: DownloadService {
             else {
                 downloader = self.createDownloader(forURLRequest: urlRequest, fileIdentifier: fileIdentifier, inMemory: handler.inMemory, retryCount: retryCount)
 
-                downloader.finilizeCallback = {
-                    self.queue.addOperation {
+                downloader.finilizeCallback = { [weak self] in
+                    guard let self = self else { return }
+                    self.queue.addOperation { [weak self] in
+                        guard let self = self else { return }
                         self.fileIdentifierToDownloaderMap.removeValue(forKey: fileIdentifier)
                     }
                 }
