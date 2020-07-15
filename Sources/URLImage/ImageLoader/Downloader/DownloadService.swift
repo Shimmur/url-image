@@ -150,7 +150,8 @@ final class DownloadServiceImpl: DownloadService {
     }
 
     func remove(_ handler: DownloadHandler, fromURLRequest urlRequest: URLRequest, withFileIdentifier fileIdentifier: String) {
-        queue.addOperation {
+        queue.addOperation { [weak self] in
+            guard let self = self else { return }
             guard let downloader = self.fileIdentifierToDownloaderMap[fileIdentifier] else {
                 return
             }
@@ -172,7 +173,8 @@ final class DownloadServiceImpl: DownloadService {
             log_debug(self, "Load \"\(url)\".")
         }
 
-        queue.addOperation {
+        queue.addOperation { [weak self] in
+            guard let self = self else { return }
             guard let downloader = self.fileIdentifierToDownloaderMap[fileIdentifier] else {
                 // Downloaded could've been removed at this moment
                 return
